@@ -69,6 +69,7 @@
                 pauseOnHover: true,
                 pauseOnFocus: true,
                 pauseOnDotsHover: false,
+                random: false,
                 respondTo: 'window',
                 responsive: null,
                 rows: 1,
@@ -704,14 +705,26 @@
             case 'previous':
                 slideOffset = indexOffset === 0 ? _.options.slidesToScroll : _.options.slidesToShow - indexOffset;
                 if (_.slideCount > _.options.slidesToShow) {
-                    _.slideHandler(_.currentSlide - slideOffset, false, dontAnimate);
+                    var nextSlide = _.currentSlide - slideOffset;
+
+                    if(_.options.random) {
+                        nextSlide = _.getRandomSlide() || nextSlide;
+                    }
+
+                    _.slideHandler(nextSlide, false, dontAnimate);
                 }
                 break;
 
             case 'next':
                 slideOffset = indexOffset === 0 ? _.options.slidesToScroll : indexOffset;
                 if (_.slideCount > _.options.slidesToShow) {
-                    _.slideHandler(_.currentSlide + slideOffset, false, dontAnimate);
+                    var nextSlide = _.currentSlide + slideOffset;
+
+                    if(_.options.random) {
+                        nextSlide = _.getRandomSlide() || nextSlide;
+                    }
+
+                    _.slideHandler(nextSlide, false, dontAnimate);
                 }
                 break;
 
@@ -1235,6 +1248,21 @@
 
     };
 
+    Slick.prototype.getRandomSlide = function() {
+
+        var _ = this,
+            slide;
+
+        if (_.options.random && _.slideCount > 1) {
+            do {
+                slide = Math.floor(Math.random() * _.slideCount)
+            } while (slide === _.currentSlide)
+        }
+
+        return slide;
+
+    };
+
     Slick.prototype.getSlideCount = function() {
 
         var _ = this,
@@ -1275,6 +1303,10 @@
     Slick.prototype.goTo = Slick.prototype.slickGoTo = function(slide, dontAnimate) {
 
         var _ = this;
+
+        if (slide === 'random') {
+            slide = _.getRandomSlide() || slide;
+        }
 
         _.changeSlide({
             data: {
@@ -2515,6 +2547,11 @@
         }
 
         targetSlide = index;
+
+        if (_.options.random) {
+            targetSlide = _.getRandomSlide() || targetSlide
+        }
+
         targetLeft = _.getLeft(targetSlide);
         slideLeft = _.getLeft(_.currentSlide);
 
