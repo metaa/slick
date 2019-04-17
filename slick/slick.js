@@ -69,6 +69,7 @@
                 pauseOnHover: true,
                 pauseOnFocus: true,
                 pauseOnDotsHover: false,
+                random: false,
                 respondTo: 'window',
                 responsive: null,
                 rows: 1,
@@ -704,14 +705,30 @@
             case 'previous':
                 slideOffset = indexOffset === 0 ? _.options.slidesToScroll : _.options.slidesToShow - indexOffset;
                 if (_.slideCount > _.options.slidesToShow) {
-                    _.slideHandler(_.currentSlide - slideOffset, false, dontAnimate);
+                    var nextSlide = _.currentSlide - slideOffset;
+
+                    if(_.options.random && _.slideCount > 1) {
+                        do {
+                            nextSlide = Math.floor(Math.random() * _.slideCount);
+                        } while(nextSlide === _.currentSlide)
+                    }
+
+                    _.slideHandler(nextSlide, false, dontAnimate);
                 }
                 break;
 
             case 'next':
                 slideOffset = indexOffset === 0 ? _.options.slidesToScroll : indexOffset;
                 if (_.slideCount > _.options.slidesToShow) {
-                    _.slideHandler(_.currentSlide + slideOffset, false, dontAnimate);
+                    var nextSlide = _.currentSlide + slideOffset;
+
+                    if(_.options.random && _.slideCount > 1) {
+                        do {
+                            nextSlide = Math.floor(Math.random() * _.slideCount);
+                        } while(nextSlide === _.currentSlide)
+                    }
+
+                    _.slideHandler(nextSlide, false, dontAnimate);
                 }
                 break;
 
@@ -1275,6 +1292,12 @@
     Slick.prototype.goTo = Slick.prototype.slickGoTo = function(slide, dontAnimate) {
 
         var _ = this;
+
+        if(slide === 'random' && _.slideCount > 1) {
+            do {
+                slide = Math.floor(Math.random() * _.slideCount)
+            } while(slide === _.currentSlide)
+        }
 
         _.changeSlide({
             data: {
